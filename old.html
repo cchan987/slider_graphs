@@ -1,0 +1,106 @@
+<!doctype html>
+<p id="tl">path testing</p>
+
+<!-- SPEED SLIDER CODE -->
+<p>
+  <label for="speed" 
+         style="display: inline-block; width: 240px; text-align: right">
+         Speed = <span id="speed-value">…</span>
+  </label>
+  <input type="range" min="0" max="1000" value="50" id="speed">
+</p>
+<!-- END OF SPEED SLIDER CODE -->
+
+<!-- INPUT SLIDER CODE -->
+<p>
+  <label for="nRadius" 
+         style="display: inline-block; width: 240px; text-align: right">
+         Input B = <span id="nRadius-value">…</span>
+  </label>
+  <input type="range" min="-20" max="20" value="5" id="nRadius">
+</p>
+<!-- END OF INPUT SLIDER CODE -->
+
+<!-- Pause Button -->
+<button id="pause_button">Pause</button>
+
+
+<html>
+<body>
+<script src="http://d3js.org/d3.v3.min.js"></script>
+<script src="sliders.js"> </script>
+<script src="circular_buffer.js"> </script>
+<script src="timer_code.js"> </script>
+<script type="text/javascript">
+
+////////////////////////////Drawing Lines/////////////////////////////////////////////////
+function draw_line(chart_data){
+
+	group.selectAll("path")
+   		.remove()
+
+   	group.selectAll("path")
+   		.data([chart_data])
+   		.enter()
+   		.append("path")
+   		//.attr("width", function(d) {return widthScale(d);})
+   		.attr("d",line)
+   		.attr("fill", "none")
+   		.attr("stroke", "#000")
+   		.attr("stroke-width", 1);
+}
+function update_rand(){
+	//rand betweem -1 and 1
+	update_count++;
+	document.getElementById('tl').innerHTML= "path testing, update_count: " + update_count;
+	var rnumber1=Math.floor(Math.random()*input_slider );
+	var temp = {y:rnumber1};
+	old_data.buf_write(chart_data.shift());
+	chart_data.push(temp);
+	//console.log(chart_data);
+	draw_line(chart_data);
+	return temp;
+}
+////////////////////////////////////////////////////////////////////////////
+
+
+var old_data = new CircleBuffer(1000);
+
+var chart_data = [];
+
+for (var i = 0; i<101; i++){
+  chart_data.push({y:5});
+}
+
+var update_count = 0;
+
+var widthScale = d3.scale.linear()
+					.domain([0,100])
+					.range([0,1000]);
+
+var Xaxis = d3.svg.axis()
+				.scale(widthScale)
+        .ticks(20);
+
+var canvas = d3.select("body").append("svg")
+    .attr("width", 5000)
+    .attr("height", 500)
+
+canvas.append("g")
+	.attr("transform", "translate(100,170)")
+	.call(Xaxis);   
+
+var group = canvas.append("g")
+			.attr("transform", "translate(100,100)");
+
+var line = d3.svg.line()
+	.x(function(d,i) {return i*10;})
+	.y(function(d) {return d.y;});		
+
+
+
+timer();
+
+
+</script>
+</body>

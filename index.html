@@ -1,5 +1,7 @@
 <!doctype html>
 <p id="tl">path testing</p>
+<p id="showing">Showing update:</p>
+<p id="direction">Going Forward</p>
 
 <!-- SPEED SLIDER CODE -->
 <p>
@@ -24,6 +26,9 @@
 <!-- Pause Button -->
 <button id="pause_button">Pause</button>
 
+<!-- Reverse Button -->
+<button id="reverse_button">Reverse</button>
+
 
 <html>
 <body>
@@ -31,6 +36,7 @@
 <script src="sliders.js"> </script>
 <script src="circular_buffer.js"> </script>
 <script src="timer_code.js"> </script>
+<script src="reverse_code.js"> </script>
 <script type="text/javascript">
 
 ////////////////////////////Drawing Lines/////////////////////////////////////////////////
@@ -49,23 +55,52 @@ function draw_line(chart_data){
    		.attr("stroke", "#000")
    		.attr("stroke-width", 1);
 }
+
 function update_rand(){
-	//rand betweem -1 and 1
-	update_count++;
-	document.getElementById('tl').innerHTML= "path testing, update_count: " + update_count;
-	var rnumber1=Math.floor(Math.random()*input_slider );
-	var temp = {y:rnumber1};
-	old_data.buf_write(chart_data.shift());
-	chart_data.push(temp);
-	//console.log(chart_data);
-	draw_line(chart_data);
-	return temp;
+	//perform update on counter for top right 
+  //console.log(updates_back)
+  if (updates_back == 0){
+  	update_count++;
+  	document.getElementById('tl').innerHTML= "path testing, update_count: " + update_count;
+
+    //create an object with a random number
+  	var rnumber1=Math.floor(Math.random()*input_slider );
+  	var temp = {update_number: update_count,y:rnumber1};
+
+    //Push the new data into the chart, push old data to old array and out of old array
+  	chart_data.push(temp);
+    chart_data_len++;
+    if (chart_data_len >= max_data){
+      chart_data.shift();
+    }
+  	//console.log(chart_data);
+  	draw_line(chart_data.slice(-101));
+    document.getElementById("showing").innerHTML = "Showing update: " + update_count;
+  	return temp;
+  }
+  else{
+    updates_back--;
+    display_data = chart_data.slice(-101-updates_back,-updates_back);
+    draw_line(display_data);
+    //console.log(display_data);
+    if (typeof display_data[100]=== 'undefined'){
+      document.getElementById("showing").innerHTML = "Showing update: " + chart_data_len - max_data;
+    }
+    else{
+      document.getElementById("showing").innerHTML = "Showing update: " + display_data[100].update_number;
+    }
+  }
 }
-////////////////////////////////////////////////////////////////////////////
 
+///////////////////////////////////////////////////////////////////////
+var chart_data_len = 101;
+var max_data = 1000;
 
-var old_data = new CircleBuffer(1000);
 var chart_data = [];
+for (var i = 0; i<chart_data_len; i++){
+  chart_data.push({time:0,y:5});
+}
+
 var update_count = 0;
 
 var widthScale = d3.scale.linear()
@@ -91,9 +126,6 @@ var line = d3.svg.line()
 	.x(function(d,i) {return i*10;})
 	.y(function(d) {return d.y;});		
 
-for (var i = 0; i<101; i++){
-	chart_data.push({ y:5});
-}
 
 timer();
 
