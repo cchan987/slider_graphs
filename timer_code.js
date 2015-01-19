@@ -4,21 +4,15 @@ document.getElementById("pause_button").addEventListener("click", function(){
 	timer();
 });
 
-document.getElementById("reverse_button").addEventListener("click",function(){
-	rewind();
-});
-
-
-//TO BE IMPROVED GREATLY
-//Currently requires double buffer size memory
-
 
 
 //TIMER CODE
 var is_paused = false;
 
+//toggle_pause: toggles is_paused boolean and updates the screen
+//PRE: True
+//POST: Pauses/Resumes graph updates and screen elements.
 function toggle_pause(){
-	console.log("is_paused");
 	if(is_paused){
 		is_paused = false;
 		document.getElementById("pause_button").innerHTML = "Pause";
@@ -36,21 +30,22 @@ function toggle_pause(){
 	}
 }
 
+//timer: schedules updates for the graph. Speed of updates controlled by slider
+//PRE: True
+//POST: Launches updates at an interval determined by the value of the speed slider
 function timer(){
 	setTimeout(
 		function(){
 			if (is_paused){
 				return;
 			}
-			else {
-				if (is_reverse){
-					update_reverse();
-					return timer();
-				}
-				else{
-					update_rand();
-					return timer();	
-				}
+			else if (is_reverse){
+				update_reverse();
+				return timer();
+			}
+			else{
+				update_rand();
+				return timer();	
 			}
 		}
 			,speed_slider);

@@ -6,39 +6,50 @@ document.getElementById("reverse_button").addEventListener("click",function(){
 	rewind();
 });
 
-//Variables for reversing
-var is_reverse = false;
+//Global Variables for reversing///
+var is_reverse = false; // Checks if reversing
 
-var updates_back = 0;
-//////////////////////////
+var at_start = false; // Checks if the graph is at the start
 
-//Move backwards in the data
+var updates_back = 1;
+
+var showing_update_num;
+///////////////////////////////////
+
+//update_reverse: Rewinds through previously generated elements in the chart_data array
+// PRE: True
+// POST: Updates screen elements, increments updates_back. Or does nothing if at beginning of data
 function update_reverse(){
-	//used for holding the graph
-	var display_data;
+	//Display pause, Do nothing when at start
+	if (at_start){
+		document.getElementById("direction").innerHTML = "Paused";
+		return;
+	}
 
+	//get the appropriate section of data from the chart_data array to display
 	display_data = chart_data.slice(-101-updates_back,-updates_back);
 
+	//increment how far back the user has rewound
 	updates_back++;
-
-	//console.log(reverse_holder_len);
-	//console.log(display_data.length);
+	
+	//draw the line
 	draw_line(display_data);
-	//forward_data.unshift(holder.pop());
 
+	//update the "SHOWING UPDATE: X" field, if at the beginning of data, change boolean at_start to true
 	if (typeof display_data[100]=== 'undefined'){
-	  document.getElementById("showing").innerHTML = "Showing update: 0";
+		at_start = true;
+	  	document.getElementById("showing").innerHTML = "OLD DATA - Showing update: OFF THE CHARTS , " + showing_update_num ;
 	}
 	else{
-	  document.getElementById("showing").innerHTML = "Showing update: " + display_data[100].update_number;
+		showing_update_num = display_data[100].update_number;
+		document.getElementById("showing").innerHTML = "OLD DATA - Showing update: " + display_data[100].update_number;
 	}
 }
 
+//rewind: Launched when reverse button is clicked
+//PRE: True
+//POST: Data will start being shown in reverse
 function rewind(){
-	
-  	//reverse_all_data_holder = chart_data;
-
-	console.log("rewind");
 	if(is_reverse){
 		is_reverse = false;
 		document.getElementById("reverse_button").innerHTML = "Reverse";
